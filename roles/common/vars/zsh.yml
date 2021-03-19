@@ -1,0 +1,5 @@
+---
+zsh_version: zsh-5.6.2
+zsh_install_dir: "/usr/local/src/{{ zsh_version }}"
+zsh_dependencies:
+  - ncurses-devel

@@ -1,0 +1,50 @@
+---
+- name: Including ZSH Vars
+  include_vars: zsh.yml
+
+- name: Installing ZSH Dependencies
+  become: yes
+  package:
+    name: "{{ zsh_dependencies }}"
+    state: present
+
+- name: Copying ZSH Sources
+  become: yes
+  copy:
+    src: "../files/{{ zsh_version }}.tar.xz"
+    dest: "/usr/local/src/{{ zsh_version }}.tar.xz"
+  register: zsh_copy
+
+- name: Unpacking ZSH Archive
+  become: yes
+  unarchive:
+    copy: no
+    dest: /usr/local/src/
+    src: "{{ zsh_copy.dest }}"
+  when: zsh_copy.changed
+  register: zsh_unpack
+
+- name: Installing ZSH
+  become: yes
+  shell: ./configure && make && make install
+  args:
+    chdir: "{{ zsh_install_dir|quote }}"
+  when: zsh_unpack.changed
+  register: zsh_install
+
+- name: Adding ZSH to /etc/shells
+  become: yes
+  lineinfile:
+    path: /etc/shells
+    line: "{{ command.zsh }}"
+  when: zsh_install.changed
+  register: zsh_addition
+
+- name: Changing Default Shell
+  become: yes
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: "{{ command.zsh }}"
+    groups: www
+    append: yes
+  when: zsh_addition.changed

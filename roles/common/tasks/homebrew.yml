@@ -1,0 +1,8 @@
+---
+- name: Including Homebrew Vars
+  include_vars: homebrew.yml
+
+- name: Installing Homebew
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)" < /dev/null
+  args:
+    creates: /home/linuxbrew

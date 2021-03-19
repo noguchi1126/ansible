@@ -1,0 +1,7 @@
+---
+dotfiles:
+  - { name: "vim",        path: ".vim"                                    }
+  - { name: "vimrc",      path: ".vimrc"                                  }
+  - { name: "zprezto",    path: ".zprezto"                                }
+  - { name: "dir_colors", path: "dircolors-solarized/dircolors.ansi-dark" }
+

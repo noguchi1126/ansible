@@ -1,0 +1,33 @@
+---
+- name: Including Dotfile Vars
+  include_vars: dotfile.yml
+
+- name: Cloning Dotfiles
+  git:
+    repo: https://github.com/noguchi1126/dotfiles.git
+    dest: "{{ ansible_env.HOME }}/dotfiles"
+    update: no
+  register: dotfile_clone
+
+- name: Applying Patch to zprezto
+  patch:
+    src: "../files/zprezto.patch"
+    basedir: "{{ ansible_env.HOME }}/dotfiles/.zprezto/runcoms"
+    strip: 2
+  when: dotfile_clone.changed
+
+- name: Creating Symlink Dotfiles
+  file:
+    path: "{{ ansible_env.HOME }}/.{{ item.name }}"
+    src: "dotfiles/{{ item.path }}"
+    state: link
+  with_items: "{{ dotfiles }}"
+  when: dotfile_clone.changed
+  register: dotfile_symlink
+
+- name: Creating Symlink Prezto Dotfiles
+  script:
+    cmd: ../files/create_zprezto_symlink.sh
+  args:
+    executable: "{{ command.zsh }}"
+    creates: "{{ ansible_env.HOME }}/.zshrc"
